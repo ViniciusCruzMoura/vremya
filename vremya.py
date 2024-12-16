@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Bремя/Vremya v1.0 - A simple and easy-to-use library to scheduler things 
+# Bремя/Vremya v24.12.1 - A simple and easy-to-use library to scheduler things 
 #               (https://github.com/viniciuscruzmoura)
 # 
 # Usage:
@@ -41,21 +41,20 @@
 # SOFTWARE.
 ##############################################################################
 
-class SimpleScheduler():
+class VremyaScheduler():
     import sched
     import time
     import threading
     import os
     import traceback
     import importlib
+    import json
 
     def __init__(self, tasks):
-        if self.os.environ.get("basic_scheduler_enabled", "1") != "1":
+        if self.os.environ.get("vremya_enabled", "1") != "1":
             return
-        self.os.environ["basic_scheduler_enabled"] = "0"
+        self.os.environ["vremya_enabled"] = "0"
         print("Scheduler Init : ")
-        if not tasks: 
-            print("No scheduled tasks")
         filtred_tasks = []
         for t in tasks:
             try:
@@ -77,18 +76,12 @@ class SimpleScheduler():
                          daemon=False).start()
 
     def start(self):
-        try:
-            self.events()
-            self.scheduler.enter(60, 1, self.start, ())
+        while True:
             try:
+                self.events()
                 self.scheduler.run()
             except Exception as err:
-                print("FATAL: run", err)
                 self.traceback.print_exc()
-                self.scheduler.run()
-        except Exception as err:
-            print("FATAL: start", err)
-            self.traceback.print_exc()
 
     def events(self):
         for module_name, function_name, sch_timer, func_args in self.tasks:
@@ -105,6 +98,4 @@ class SimpleScheduler():
                             function_name)
                     self.scheduler.enter(60, 1, func_obj, func_args)
             except Exception as err:
-                print("FATAL: events", err)
                 self.traceback.print_exc()
-
