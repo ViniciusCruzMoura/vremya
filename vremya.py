@@ -80,6 +80,7 @@ class VremyaScheduler():
             try:
                 self.events()
                 self.scheduler.run()
+                self.time.sleep(60)
             except Exception as err:
                 self.traceback.print_exc()
 
